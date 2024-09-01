@@ -61,6 +61,7 @@ class Ads:
             async with lock:
                 await asyncio.sleep(1)
                 response = await self.session.get(self._ads_url + 'start', params=params)
+            response.raise_for_status()
             data = response.json()
             return data.get('data').get('ws').get('puppeteer')
         except Exception as e:
@@ -78,6 +79,7 @@ class Ads:
             async with lock:
                 await asyncio.sleep(1)
                 response = await self.session.get(self._ads_url + 'active', params=params)
+            response.raise_for_status()
             data = response.json()
             if data['data']['status'] == 'Active':
                 return data.get('data').get('ws').get('puppeteer')
