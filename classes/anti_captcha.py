@@ -14,10 +14,10 @@ class AntiCaptcha:
         :param image: код картинки в base 64
         :return: Кортеж с результатом решения капчи и статусом, если статус False, то вместо результата будет текст ошибки
         """
+        logger.info(f'Solving captcha...')
         for _ in range(3):
             task_id, status = await self.create_task(image)
             if status:
-                await asyncio.sleep(1)
                 result, status = await self.get_task_result(task_id)
                 if status:
                     return result, status
@@ -30,6 +30,7 @@ class AntiCaptcha:
         :param image: код картинки в base 64 (body в docs https://anti-captcha.com/ru/apidoc/task-types/ImageToTextTask)
         :return: Кортеж с айди задачи и статусом принятия задачи, если статус False, то вместо айди задачи будет текст ошибки
         """
+        logger.info(f'Creating task for solving captcha...')
         data = {
             "clientKey": anti_captcha_key,
             "task": {
@@ -45,9 +46,10 @@ class AntiCaptcha:
             response = await self.client.post(self.API_URL + 'createTask', json=data)
             response.raise_for_status()
             response_data = response.json()
-            if response_data.get('errorId') == 0:
-                return response_data.get('taskId'), True
-            return -1, False
+            if response_data.get('errorId') != 0:
+                logger.error(f"Error: {response_data.get('errorDescription')}")
+                return -1, False
+            return response_data.get('taskId'), True
         except Exception as e:
             logger.error(f"Error: {e}")
             return -1, False
@@ -58,6 +60,7 @@ class AntiCaptcha:
         :param task_id: айди задачи str
         :return: Кортеж с результатом решения капчи и статусом, если статус False, то вместо результата будет текст ошибки
         """
+        logger.info(f'Getting captcha result...')
         data = {
             "clientKey": anti_captcha_key,
             "taskId": task_id

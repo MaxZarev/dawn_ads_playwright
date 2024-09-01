@@ -8,7 +8,6 @@ from tenacity import retry, wait_fixed, stop_after_attempt
 
 from config.config import logger
 
-
 lock = asyncio.Lock()
 
 
@@ -28,10 +27,16 @@ class Ads:
         self.page = self.context.pages[0]
         await self._prepare_browser()
 
-    async def _prepare_browser(self):
-        for page in self.context.pages:
-            if self.page != page:
-                await page.close()
+    async def _prepare_browser(self) -> None:
+        """
+        Закрывает все страницы кроме текущей
+        :return: None
+        """
+        pages = self.context.pages
+        if len(pages) > 1:
+            for page in pages:
+                if self.page != page:
+                    await page.close()
 
     @retry(wait=wait_fixed(5), stop=stop_after_attempt(3))
     async def _start_browser(self) -> Browser:
