@@ -55,6 +55,4 @@ async def main():
             print(f"Profile: {account.profile} | Email: {account.email} | Reg: {account.registration_status} | Confirm: {account.confirm_status} | Login: {account.login_status} | Tasks: {account.tasks_status} | Points: {account.points}")
 
 if __name__ == '__main__':
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
