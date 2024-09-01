@@ -46,7 +46,8 @@ class Ads:
         """
         if not (endpoint := await self._check_browser_status()):
             endpoint = await self._open_browser()
-        await asyncio.sleep(5)
+            await asyncio.sleep(10)
+
         pw = await async_playwright().start()
         return await pw.chromium.connect_over_cdp(endpoint, slow_mo=1000)
 
